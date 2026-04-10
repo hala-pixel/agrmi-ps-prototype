@@ -1,0 +1,1288 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AGRMI-PS Assessment Tool</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800&family=Cairo:wght@400;600;700&display=swap');
+
+  :root {
+    --primary: #1a3c5e;
+    --secondary: #2e7d9f;
+    --accent: #e67e22;
+    --success: #27ae60;
+    --warning: #f39c12;
+    --danger: #e74c3c;
+    --light: #f4f8fb;
+    --dark: #0d1f2d;
+    --border: #dce8f0;
+    --text: #2c3e50;
+    --muted: #7f8c9a;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Tajawal', sans-serif;
+    background: var(--light);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  /* ===== HEADER ===== */
+  header {
+    background: linear-gradient(135deg, var(--dark) 0%, var(--primary) 60%, var(--secondary) 100%);
+    color: white;
+    padding: 40px 20px 50px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  header::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(ellipse at center, rgba(46,125,159,0.15) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  header .badge {
+    display: inline-block;
+    background: rgba(255,255,255,0.15);
+    border: 1px solid rgba(255,255,255,0.3);
+    padding: 5px 16px;
+    border-radius: 20px;
+    font-size: 12px;
+    letter-spacing: 1px;
+    margin-bottom: 14px;
+    font-family: 'Cairo', sans-serif;
+  }
+  header h1 {
+    font-size: clamp(22px, 4vw, 36px);
+    font-weight: 800;
+    margin-bottom: 8px;
+    line-height: 1.3;
+  }
+  header h1 span { color: #f0c040; }
+  header p {
+    font-size: 14px;
+    opacity: 0.8;
+    max-width: 600px;
+    margin: 0 auto;
+    line-height: 1.7;
+  }
+  header .meta {
+    margin-top: 18px;
+    display: flex;
+    justify-content: center;
+    gap: 24px;
+    flex-wrap: wrap;
+    font-size: 12px;
+    opacity: 0.75;
+  }
+
+  /* ===== PROGRESS BAR ===== */
+  .progress-bar-container {
+    background: white;
+    border-bottom: 1px solid var(--border);
+    padding: 14px 20px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+  }
+  .progress-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 800px;
+    margin: 0 auto 8px;
+    font-size: 13px;
+    color: var(--muted);
+    font-family: 'Cairo', sans-serif;
+  }
+  .progress-track {
+    background: var(--border);
+    height: 6px;
+    border-radius: 3px;
+    max-width: 800px;
+    margin: 0 auto;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--secondary), var(--accent));
+    border-radius: 3px;
+    transition: width 0.4s ease;
+    width: 0%;
+  }
+
+  /* ===== STEPS NAV ===== */
+  .steps-nav {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    padding: 20px;
+    flex-wrap: wrap;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+  .step-btn {
+    padding: 8px 16px;
+    border-radius: 20px;
+    border: 2px solid var(--border);
+    background: white;
+    font-family: 'Tajawal', sans-serif;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.25s;
+    color: var(--muted);
+    font-weight: 500;
+  }
+  .step-btn.active {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: white;
+  }
+  .step-btn.done {
+    background: var(--success);
+    border-color: var(--success);
+    color: white;
+  }
+
+  /* ===== CONTAINER ===== */
+  .container {
+    max-width: 820px;
+    margin: 0 auto;
+    padding: 24px 16px 60px;
+  }
+
+  /* ===== PAGES ===== */
+  .page { display: none; animation: fadeIn 0.35s ease; }
+  .page.active { display: block; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+
+  /* ===== CARD ===== */
+  .card {
+    background: white;
+    border-radius: 16px;
+    padding: 28px;
+    margin-bottom: 20px;
+    border: 1px solid var(--border);
+    box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+  }
+  .card-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--primary);
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: 'Cairo', sans-serif;
+  }
+  .card-title .icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 16px;
+    flex-shrink: 0;
+  }
+  .card-subtitle {
+    font-size: 13px;
+    color: var(--muted);
+    margin-bottom: 20px;
+    padding-right: 46px;
+    line-height: 1.6;
+  }
+
+  /* ===== FORM ===== */
+  .form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+  @media (max-width: 560px) { .form-grid { grid-template-columns: 1fr; } }
+  .form-group { display: flex; flex-direction: column; gap: 6px; }
+  .form-group label {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text);
+    font-family: 'Cairo', sans-serif;
+  }
+  .form-group select,
+  .form-group input {
+    padding: 10px 14px;
+    border: 2px solid var(--border);
+    border-radius: 10px;
+    font-family: 'Tajawal', sans-serif;
+    font-size: 14px;
+    color: var(--text);
+    background: white;
+    transition: border-color 0.2s;
+    outline: none;
+    appearance: none;
+  }
+  .form-group select:focus,
+  .form-group input:focus {
+    border-color: var(--secondary);
+  }
+
+  /* ===== DIMENSION HEADER ===== */
+  .dim-header {
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    color: white;
+    border-radius: 14px;
+    padding: 20px 24px;
+    margin-bottom: 20px;
+  }
+  .dim-header .dim-num {
+    font-size: 11px;
+    opacity: 0.7;
+    letter-spacing: 1px;
+    margin-bottom: 4px;
+    font-family: 'Cairo', sans-serif;
+  }
+  .dim-header h2 { font-size: 20px; font-weight: 700; margin-bottom: 6px; }
+  .dim-header p { font-size: 13px; opacity: 0.85; line-height: 1.6; }
+
+  /* ===== QUESTION ===== */
+  .question-block {
+    background: white;
+    border: 2px solid var(--border);
+    border-radius: 14px;
+    padding: 20px;
+    margin-bottom: 14px;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .question-block.answered {
+    border-color: #c8e6c9;
+    background: #fafffe;
+  }
+  .question-text {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 14px;
+    line-height: 1.65;
+    font-family: 'Cairo', sans-serif;
+  }
+  .question-num {
+    display: inline-block;
+    background: var(--primary);
+    color: white;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    font-size: 11px;
+    text-align: center;
+    line-height: 24px;
+    margin-left: 8px;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+
+  /* ===== LIKERT SCALE ===== */
+  .likert-scale {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .likert-option {
+    flex: 1;
+    min-width: 52px;
+    cursor: pointer;
+  }
+  .likert-option input[type="radio"] {
+    display: none;
+  }
+  .likert-option label {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 6px 8px;
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+    background: white;
+    text-align: center;
+    min-height: 64px;
+  }
+  .likert-option label .num {
+    font-size: 20px;
+    font-weight: 800;
+    color: var(--muted);
+    line-height: 1;
+    margin-bottom: 4px;
+    transition: color 0.2s;
+    font-family: 'Cairo', sans-serif;
+  }
+  .likert-option label .lbl {
+    font-size: 10px;
+    color: var(--muted);
+    line-height: 1.2;
+    transition: color 0.2s;
+    font-family: 'Tajawal', sans-serif;
+  }
+  .likert-option input[type="radio"]:checked + label {
+    border-color: var(--secondary);
+    background: linear-gradient(135deg, #e8f4fa, #d4ecf7);
+    box-shadow: 0 2px 8px rgba(46,125,159,0.2);
+  }
+  .likert-option input[type="radio"]:checked + label .num { color: var(--primary); }
+  .likert-option input[type="radio"]:checked + label .lbl { color: var(--secondary); }
+  .likert-option:nth-child(5) input[type="radio"]:checked + label {
+    border-color: var(--success);
+    background: linear-gradient(135deg, #e8f8ee, #d4f0df);
+  }
+  .likert-option:nth-child(5) input[type="radio"]:checked + label .num { color: var(--success); }
+  .likert-option:nth-child(1) input[type="radio"]:checked + label {
+    border-color: var(--danger);
+    background: linear-gradient(135deg, #fdecea, #fad5d0);
+  }
+  .likert-option:nth-child(1) input[type="radio"]:checked + label .num { color: var(--danger); }
+  .likert-scale-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 6px;
+    padding: 0 2px;
+    font-family: 'Tajawal', sans-serif;
+  }
+
+  /* ===== NAVIGATION BUTTONS ===== */
+  .nav-buttons {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    margin-top: 24px;
+    flex-wrap: wrap;
+  }
+  .btn {
+    padding: 12px 28px;
+    border-radius: 12px;
+    border: none;
+    font-family: 'Tajawal', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.25s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .btn-primary {
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    color: white;
+    box-shadow: 0 4px 14px rgba(26,60,94,0.3);
+  }
+  .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(26,60,94,0.4);
+  }
+  .btn-secondary {
+    background: white;
+    color: var(--primary);
+    border: 2px solid var(--border);
+  }
+  .btn-secondary:hover {
+    border-color: var(--secondary);
+    background: var(--light);
+  }
+  .btn-success {
+    background: linear-gradient(135deg, var(--success), #2ecc71);
+    color: white;
+    box-shadow: 0 4px 14px rgba(39,174,96,0.3);
+  }
+  .btn-success:hover { transform: translateY(-2px); }
+  .btn:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+    transform: none !important;
+  }
+
+  /* ===== WARNING BOX ===== */
+  .warning-box {
+    background: #fff8e1;
+    border: 1px solid #ffe082;
+    border-radius: 10px;
+    padding: 12px 16px;
+    font-size: 13px;
+    color: #7d5a00;
+    margin-top: 12px;
+    display: none;
+    font-family: 'Cairo', sans-serif;
+  }
+  .warning-box.show { display: block; }
+
+  /* ===== RESULTS PAGE ===== */
+  .score-hero {
+    background: linear-gradient(135deg, var(--dark), var(--primary));
+    color: white;
+    border-radius: 20px;
+    padding: 36px 28px;
+    text-align: center;
+    margin-bottom: 24px;
+    position: relative;
+    overflow: hidden;
+  }
+  .score-hero::before {
+    content: '';
+    position: absolute;
+    top: -30%;
+    right: -10%;
+    width: 300px;
+    height: 300px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.04);
+    pointer-events: none;
+  }
+  .score-circle {
+    width: 130px;
+    height: 130px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.1);
+    border: 4px solid rgba(255,255,255,0.3);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 16px;
+  }
+  .score-circle .score-val {
+    font-size: 38px;
+    font-weight: 800;
+    line-height: 1;
+    font-family: 'Cairo', sans-serif;
+  }
+  .score-circle .score-max {
+    font-size: 13px;
+    opacity: 0.6;
+  }
+  .maturity-badge {
+    display: inline-block;
+    padding: 8px 24px;
+    border-radius: 24px;
+    font-size: 14px;
+    font-weight: 700;
+    margin-bottom: 10px;
+    font-family: 'Cairo', sans-serif;
+  }
+  .maturity-emerging { background: rgba(231,76,60,0.3); border: 1px solid rgba(231,76,60,0.5); }
+  .maturity-developing { background: rgba(243,156,18,0.3); border: 1px solid rgba(243,156,18,0.5); }
+  .maturity-established { background: rgba(39,174,96,0.3); border: 1px solid rgba(39,174,96,0.5); }
+  .maturity-advanced { background: rgba(52,152,219,0.3); border: 1px solid rgba(52,152,219,0.5); }
+
+  .dim-scores-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin-bottom: 20px;
+  }
+  @media (max-width: 560px) { .dim-scores-grid { grid-template-columns: 1fr; } }
+
+  .dim-score-card {
+    background: white;
+    border-radius: 14px;
+    padding: 18px;
+    border: 1px solid var(--border);
+  }
+  .dim-score-card .dim-name {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 12px;
+    font-family: 'Cairo', sans-serif;
+    line-height: 1.4;
+  }
+  .score-bar-track {
+    background: var(--border);
+    height: 8px;
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 6px;
+  }
+  .score-bar-fill {
+    height: 100%;
+    border-radius: 4px;
+    transition: width 1s ease;
+  }
+  .dim-score-meta {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    color: var(--muted);
+    font-family: 'Cairo', sans-serif;
+  }
+  .dim-score-meta .val { font-weight: 700; color: var(--primary); }
+
+  .rec-card {
+    border-radius: 14px;
+    padding: 18px 20px;
+    margin-bottom: 12px;
+    border-right: 5px solid;
+  }
+  .rec-high { background: #fdecea; border-color: var(--danger); }
+  .rec-med { background: #fff8e1; border-color: var(--warning); }
+  .rec-low { background: #e8f8ee; border-color: var(--success); }
+  .rec-card .priority {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 6px;
+    font-family: 'Cairo', sans-serif;
+  }
+  .rec-high .priority { color: var(--danger); }
+  .rec-med .priority { color: #b7770d; }
+  .rec-low .priority { color: var(--success); }
+  .rec-card .rec-text {
+    font-size: 14px;
+    color: var(--text);
+    line-height: 1.65;
+    font-family: 'Tajawal', sans-serif;
+  }
+
+  .comparison-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    font-family: 'Cairo', sans-serif;
+  }
+  .comparison-table th {
+    background: var(--primary);
+    color: white;
+    padding: 10px 14px;
+    text-align: right;
+    font-weight: 600;
+  }
+  .comparison-table td {
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text);
+  }
+  .comparison-table tr:hover td { background: var(--light); }
+  .comparison-table .highlight td {
+    background: #e8f4fa;
+    font-weight: 600;
+  }
+
+  /* ===== INTRO PAGE ===== */
+  .intro-hero {
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    color: white;
+    border-radius: 20px;
+    padding: 40px 32px;
+    text-align: center;
+    margin-bottom: 24px;
+  }
+  .intro-hero h2 { font-size: 26px; font-weight: 800; margin-bottom: 10px; }
+  .intro-hero p { font-size: 14px; opacity: 0.85; line-height: 1.7; max-width: 500px; margin: 0 auto; }
+  .feature-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+    margin-bottom: 24px;
+  }
+  @media (max-width: 600px) { .feature-grid { grid-template-columns: 1fr; } }
+  .feature-item {
+    background: white;
+    border-radius: 14px;
+    padding: 20px 16px;
+    text-align: center;
+    border: 1px solid var(--border);
+  }
+  .feature-item .f-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 14px;
+    background: var(--light);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 12px;
+    font-size: 20px;
+  }
+  .feature-item h4 { font-size: 14px; font-weight: 700; color: var(--primary); margin-bottom: 6px; font-family: 'Cairo', sans-serif; }
+  .feature-item p { font-size: 12px; color: var(--muted); line-height: 1.5; }
+
+  .info-note {
+    background: #e8f4fa;
+    border: 1px solid #b3d7ea;
+    border-radius: 12px;
+    padding: 14px 18px;
+    font-size: 13px;
+    color: var(--primary);
+    line-height: 1.6;
+    margin-bottom: 20px;
+    font-family: 'Tajawal', sans-serif;
+  }
+
+  @media print {
+    .progress-bar-container, .steps-nav, .nav-buttons, header .meta { display: none; }
+    .card { box-shadow: none; border: 1px solid #ccc; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="badge">SUPPLEMENTARY MATERIAL | RESEARCH PROTOTYPE</div>
+  <h1>AGRMI-PS <span>Assessment Tool</span></h1>
+  <p>AI Governance Readiness Maturity Index for Palestinian Organizations<br>
+  Developed as a companion tool to the research paper</p>
+  <div class="meta">
+    <span>Version 1.0 | 2025</span>
+    <span>5 Dimensions | 20 Questions</span>
+    <span>Likert Scale 1-5</span>
+    <span>West Bank, Palestine</span>
+  </div>
+</header>
+
+<div class="progress-bar-container">
+  <div class="progress-info">
+    <span id="stepLabel">الخطوة 1 من 8</span>
+    <span id="pctLabel">0%</span>
+  </div>
+  <div class="progress-track">
+    <div class="progress-fill" id="progressFill"></div>
+  </div>
+</div>
+
+<div class="steps-nav">
+  <button class="step-btn active" onclick="goToStep(0)">مقدمة</button>
+  <button class="step-btn" onclick="goToStep(1)">بيانات المنظمة</button>
+  <button class="step-btn" onclick="goToStep(2)">البُعد 1</button>
+  <button class="step-btn" onclick="goToStep(3)">البُعد 2</button>
+  <button class="step-btn" onclick="goToStep(4)">البُعد 3</button>
+  <button class="step-btn" onclick="goToStep(5)">البُعد 4</button>
+  <button class="step-btn" onclick="goToStep(6)">البُعد 5</button>
+  <button class="step-btn" onclick="goToStep(7)">النتائج</button>
+</div>
+
+<div class="container">
+
+  <!-- PAGE 0: INTRO -->
+  <div class="page active" id="page-0">
+    <div class="intro-hero">
+      <h2>مرحباً بك في أداة AGRMI-PS</h2>
+      <p>هذا النموذج الأولي مرافق للورقة البحثية حول جاهزية حوكمة الذكاء الاصطناعي في المنظمات الفلسطينية. يساعدك على تقييم مستوى نضج منظمتك عبر خمسة أبعاد رئيسية.</p>
+    </div>
+    <div class="feature-grid">
+      <div class="feature-item">
+        <div class="f-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1a3c5e" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M9 9h6M9 12h6M9 15h4"/></svg>
+        </div>
+        <h4>20 سؤالاً</h4>
+        <p>موزعة على 5 أبعاد اساسية لحوكمة الذكاء الاصطناعي</p>
+      </div>
+      <div class="feature-item">
+        <div class="f-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1a3c5e" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
+        </div>
+        <h4>5-10 دقائق</h4>
+        <p>الوقت المتوقع لاكمال التقييم بالكامل</p>
+      </div>
+      <div class="feature-item">
+        <div class="f-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1a3c5e" stroke-width="2"><path d="M12 2l3 7h7l-6 4 2 7-6-4-6 4 2-7-6-4h7z"/></svg>
+        </div>
+        <h4>نتائج فورية</h4>
+        <p>تقرير تفصيلي مع مستوى النضج والتوصيات</p>
+      </div>
+    </div>
+    <div class="info-note">
+      <strong>ملاحظة للمقيّم:</strong> يُعبّر كل سؤال عن ممارسة من ممارسات حوكمة الذكاء الاصطناعي. قيّم مدى تطبيق كل ممارسة في منظمتك على مقياس من 1 (غائبة تماماً) إلى 5 (مطبّقة بالكامل وموثّقة). الصدق في الإجابة يُحقق نتائج أكثر دقة ويُساعد في رسم خريطة التطوير.
+    </div>
+    <div class="nav-buttons" style="justify-content:flex-end">
+      <button class="btn btn-primary" onclick="nextStep()">
+        ابدأ التقييم
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- PAGE 1: ORG INFO -->
+  <div class="page" id="page-1">
+    <div class="card">
+      <div class="card-title">
+        <div class="icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg>
+        </div>
+        بيانات المنظمة
+      </div>
+      <p class="card-subtitle">تُستخدم هذه البيانات لتخصيص نتائج التقييم ومقارنتها مع متوسطات الدراسة. جميع البيانات سرية.</p>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>اسم المنظمة (اختياري)</label>
+          <input type="text" id="orgName" placeholder="مثال: وزارة الاتصالات...">
+        </div>
+        <div class="form-group">
+          <label>نوع القطاع *</label>
+          <select id="orgSector">
+            <option value="">-- اختر القطاع --</option>
+            <option value="public">القطاع الحكومي / العام</option>
+            <option value="private">القطاع الخاص</option>
+            <option value="ngo">منظمة غير حكومية (NGO)</option>
+            <option value="academic">الجامعات والمؤسسات الأكاديمية</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>حجم المنظمة *</label>
+          <select id="orgSize">
+            <option value="">-- اختر الحجم --</option>
+            <option value="small">صغيرة (1-50 موظف)</option>
+            <option value="medium">متوسطة (51-200 موظف)</option>
+            <option value="large">كبيرة (201-500 موظف)</option>
+            <option value="xlarge">كبيرة جداً (500+ موظف)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>موقع المنظمة *</label>
+          <select id="orgLocation">
+            <option value="">-- اختر الموقع --</option>
+            <option value="ramallah">رام الله والبيرة</option>
+            <option value="nablus">نابلس</option>
+            <option value="hebron">الخليل</option>
+            <option value="bethlehem">بيت لحم</option>
+            <option value="jenin">جنين</option>
+            <option value="tulkarm">طولكرم</option>
+            <option value="qalqilya">قلقيلية</option>
+            <option value="jericho">أريحا</option>
+            <option value="other">محافظة أخرى</option>
+          </select>
+        </div>
+        <div class="form-group" style="grid-column: 1 / -1;">
+          <label>هل تستخدم منظمتك تقنيات الذكاء الاصطناعي حالياً؟ *</label>
+          <select id="aiUsage">
+            <option value="">-- اختر --</option>
+            <option value="none">لا، لا نستخدم أي تقنيات ذكاء اصطناعي</option>
+            <option value="exploring">نستكشف الإمكانيات حالياً</option>
+            <option value="pilot">نجري تجارب محدودة (Pilot)</option>
+            <option value="partial">نستخدم بعض الأنظمة بشكل جزئي</option>
+            <option value="full">نستخدم الذكاء الاصطناعي بشكل واسع</option>
+          </select>
+        </div>
+      </div>
+      <div class="warning-box" id="orgWarning">
+        يرجى ملء الحقول الإلزامية المميّزة بـ (*) قبل المتابعة.
+      </div>
+    </div>
+    <div class="nav-buttons">
+      <button class="btn btn-secondary" onclick="prevStep()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg>
+        السابق
+      </button>
+      <button class="btn btn-primary" onclick="validateOrgAndNext()">
+        التالي: البُعد الأول
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- PAGES 2-6: DIMENSIONS -->
+  <div class="page" id="page-2"></div>
+  <div class="page" id="page-3"></div>
+  <div class="page" id="page-4"></div>
+  <div class="page" id="page-5"></div>
+  <div class="page" id="page-6"></div>
+
+  <!-- PAGE 7: RESULTS -->
+  <div class="page" id="page-7">
+    <div class="score-hero" id="scoreHero">
+      <div class="score-circle">
+        <span class="score-val" id="totalScore">--</span>
+        <span class="score-max">من 100</span>
+      </div>
+      <div class="maturity-badge" id="maturityBadge">جاري الحساب...</div>
+      <h2 id="maturityTitle" style="font-size:22px;margin-bottom:8px;"></h2>
+      <p id="maturityDesc" style="font-size:13px;opacity:0.85;line-height:1.7;max-width:480px;margin:0 auto;"></p>
+    </div>
+
+    <div class="card">
+      <div class="card-title">
+        <div class="icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+        </div>
+        النتائج التفصيلية حسب البُعد
+      </div>
+      <p class="card-subtitle">درجة كل بُعد من أبعاد AGRMI-PS مقارنةً بالحد الأقصى (20 نقطة لكل بُعد)</p>
+      <div class="dim-scores-grid" id="dimScoresGrid"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">
+        <div class="icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M3 3v18h18"/><path d="M18 17V9M13 17V5M8 17v-3"/></svg>
+        </div>
+        مقارنة مع نتائج الدراسة
+      </div>
+      <p class="card-subtitle">مقارنة درجاتك بمتوسطات الدراسة التي شملت 40 منظمة فلسطينية في الضفة الغربية</p>
+      <div style="overflow-x:auto;">
+        <table class="comparison-table" id="compTable">
+          <thead>
+            <tr>
+              <th>البُعد</th>
+              <th>درجتك</th>
+              <th>متوسط الدراسة</th>
+              <th>الفجوة</th>
+            </tr>
+          </thead>
+          <tbody id="compTableBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card" id="recsCard">
+      <div class="card-title">
+        <div class="icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+        </div>
+        التوصيات ذات الأولوية
+      </div>
+      <p class="card-subtitle">بناءً على أضعف الأبعاد في تقييمك، نوصي بالتركيز على المحاور التالية</p>
+      <div id="recsContainer"></div>
+    </div>
+
+    <div class="card" style="background:linear-gradient(135deg,#e8f4fa,#d4ecf7);border:1px solid #b3d7ea;">
+      <div class="card-title" style="color:var(--primary);">
+        <div class="icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M13 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V9z"/><polyline points="13 2 13 9 20 9"/></svg></div>
+        للاستشهاد بهذه الأداة
+      </div>
+      <p style="font-size:13px;color:var(--primary);line-height:1.7;font-family:'Cairo',sans-serif;padding-right:46px;">
+        أداة AGRMI-PS مرفقة كمادة تكميلية للورقة البحثية حول جاهزية حوكمة الذكاء الاصطناعي في المنظمات الفلسطينية (2025). تمّ تطوير المؤشر استناداً إلى إطار عمل يجمع بين معايير UNESCO AI Ethics وISO/IEC 42001 وأُطر حوكمة إقليمية، مع مراعاة السياق الخاص بمنظمات الضفة الغربية.
+      </p>
+    </div>
+
+    <div class="nav-buttons">
+      <button class="btn btn-secondary" onclick="resetAssessment()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 102.13-9.36L1 10"/></svg>
+        إعادة التقييم
+      </button>
+      <button class="btn btn-success" onclick="window.print()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+        طباعة التقرير
+      </button>
+    </div>
+  </div>
+
+</div><!-- /container -->
+
+<script>
+// ============================================================
+// DATA
+// ============================================================
+const dimensions = [
+  {
+    id: 1,
+    nameAr: "الاستراتيجية والقيادة",
+    nameEn: "Strategy & Leadership",
+    descAr: "مدى وجود رؤية واستراتيجية واضحة للذكاء الاصطناعي وقيادة داعمة على مستوى المنظمة.",
+    studyAvg: 9.2,
+    questions: [
+      "تمتلك منظمتنا استراتيجية موثقة ومعتمدة للذكاء الاصطناعي تحدد أهدافاً وجداول زمنية واضحة.",
+      "توجد قيادة تنفيذية مخصصة (مثل CAIO أو ما يعادله) مسؤولة عن ملف الذكاء الاصطناعي.",
+      "تتوافق مبادرات الذكاء الاصطناعي لدينا بوضوح مع الأهداف الاستراتيجية الأشمل للمنظمة.",
+      "يوجد ميزانية مخصصة ومحددة لمشاريع وحوكمة الذكاء الاصطناعي في منظمتنا."
+    ]
+  },
+  {
+    id: 2,
+    nameAr: "الإطار التنظيمي والسياسات",
+    nameEn: "Regulatory Framework & Policies",
+    descAr: "مدى توافر سياسات واضحة تنظّم استخدام الذكاء الاصطناعي وتضمن الامتثال للمتطلبات القانونية والأخلاقية.",
+    studyAvg: 7.8,
+    questions: [
+      "تمتلك منظمتنا سياسة مكتوبة ومعتمدة رسمياً تُنظّم استخدام أنظمة الذكاء الاصطناعي.",
+      "تتضمن سياساتنا أحكاماً تعالج مسائل الخصوصية وحماية البيانات في سياق الذكاء الاصطناعي.",
+      "نلتزم بإجراءات واضحة لتقييم الامتثال القانوني قبل نشر أي حل ذكاء اصطناعي.",
+      "يجري مراجعة دورية منتظمة لسياسات الذكاء الاصطناعي بما يتناسب مع المستجدات التكنولوجية والتنظيمية."
+    ]
+  },
+  {
+    id: 3,
+    nameAr: "الجاهزية التقنية",
+    nameEn: "Technical Readiness",
+    descAr: "مستوى البنية التحتية التقنية والكفاءات المؤسسية لتطوير أنظمة الذكاء الاصطناعي وإدارتها.",
+    studyAvg: 11.4,
+    questions: [
+      "توفر منظمتنا البنية التحتية التقنية الضرورية (حوسبة، بيانات، أنظمة) لدعم تطبيقات الذكاء الاصطناعي.",
+      "لديناكوادر تقنية مدرّبة ومؤهلة لتطوير وصيانة أنظمة الذكاء الاصطناعي.",
+      "توجد ممارسات موثّقة لإدارة جودة البيانات وضمان موثوقيتها قبل استخدامها في نماذج الذكاء الاصطناعي.",
+      "نعتمد أطر عمل قياسية موثّقة لدورة حياة تطوير الذكاء الاصطناعي (تصميم، تدريب، نشر، مراقبة)."
+    ]
+  },
+  {
+    id: 4,
+    nameAr: "الشفافية والمساءلة",
+    nameEn: "Transparency & Accountability",
+    descAr: "مدى وضوح آليات المساءلة ومتطلبات الشفافية في أنظمة الذكاء الاصطناعي المستخدمة.",
+    studyAvg: 8.6,
+    questions: [
+      "تفصح منظمتنا بانتظام وبشكل منظم عن طبيعة أنظمة الذكاء الاصطناعي المستخدمة وأغراضها لأصحاب المصلحة.",
+      "وجود آليات رسمية وواضحة لتلقي شكاوى المتأثرين بقرارات الذكاء الاصطناعي والاستجابة لها.",
+      "تُجري منظمتنا عمليات تدقيق دورية لأنظمة الذكاء الاصطناعي للتحقق من مطابقتها لمعايير الأداء والأخلاقيات.",
+      "تمتلك منظمتنا إجراءات موثقة لتحديد المسؤولية وتعيينها عند وقوع أخطاء أو انحيازات في أنظمة الذكاء الاصطناعي."
+    ]
+  },
+  {
+    id: 5,
+    nameAr: "الأخلاقيات والشمولية",
+    nameEn: "Ethics & Inclusion",
+    descAr: "مدى مراعاة الاعتبارات الأخلاقية وضمان عدم التمييز والشمولية في تصميم وتشغيل أنظمة الذكاء الاصطناعي.",
+    studyAvg: 10.1,
+    questions: [
+      "تضمّنت منظمتنا قيماً أخلاقية صريحة (كالعدالة وعدم التمييز والاحترام) في إطار حوكمة الذكاء الاصطناعي.",
+      "نُجري تقييمات منهجية لاحتمالية التحيز والتأثيرات غير المقصودة قبل نشر أنظمة الذكاء الاصطناعي.",
+      "تضمن مبادراتنا في الذكاء الاصطناعي شمول الفئات المهمشة وعدم تعميق الفجوات الرقمية أو الاجتماعية.",
+      "يتلقى العاملون في منظمتنا تدريباً دورياً على أخلاقيات الذكاء الاصطناعي وتطبيقاتها العملية."
+    ]
+  }
+];
+
+const likertLabels = ["غائبة","محدودة","جزئية","جيدة","كاملة"];
+
+// ============================================================
+// STATE
+// ============================================================
+let currentStep = 0;
+const TOTAL_STEPS = 8;
+let answers = {}; // key: "d{dim}q{q}" => value 1-5
+
+// ============================================================
+// BUILD DIMENSION PAGES
+// ============================================================
+function buildDimPage(dimIndex) {
+  const dim = dimensions[dimIndex];
+  const pageEl = document.getElementById('page-' + (dimIndex + 2));
+
+  let html = `
+    <div class="dim-header">
+      <div class="dim-num">البُعد ${dim.id} من 5 &nbsp;|&nbsp; ${dim.nameEn}</div>
+      <h2>${dim.nameAr}</h2>
+      <p>${dim.descAr}</p>
+    </div>
+    <div id="dimWarning-${dimIndex}" class="warning-box">يرجى الإجابة على جميع الأسئلة في هذا البُعد قبل المتابعة.</div>
+  `;
+
+  dim.questions.forEach(function(qText, qIndex) {
+    const key = 'd' + dimIndex + 'q' + qIndex;
+    html += `
+      <div class="question-block" id="qblock-${key}">
+        <div class="question-text">
+          <span class="question-num">${qIndex + 1}</span>
+          ${qText}
+        </div>
+        <div class="likert-scale">
+    `;
+    for (let v = 1; v <= 5; v++) {
+      html += `
+          <div class="likert-option">
+            <input type="radio" name="${key}" id="${key}-${v}" value="${v}" onchange="recordAnswer('${key}', ${v})">
+            <label for="${key}-${v}">
+              <span class="num">${v}</span>
+              <span class="lbl">${likertLabels[v-1]}</span>
+            </label>
+          </div>
+      `;
+    }
+    html += `
+        </div>
+        <div class="likert-scale-labels">
+          <span>1 = غير موجودة اطلاقاً</span>
+          <span>5 = مطبقة بالكامل</span>
+        </div>
+      </div>
+    `;
+  });
+
+  let isLast = (dimIndex === 4);
+  html += `
+    <div class="nav-buttons">
+      <button class="btn btn-secondary" onclick="prevStep()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg>
+        السابق
+      </button>
+      <button class="btn ${isLast ? 'btn-success' : 'btn-primary'}" onclick="validateDimAndNext(${dimIndex})">
+        ${isLast ? 'عرض النتائج' : 'التالي: البُعد ' + (dim.id + 1)}
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>
+      </button>
+    </div>
+  `;
+
+  pageEl.innerHTML = html;
+}
+
+// ============================================================
+// ANSWER RECORDING
+// ============================================================
+function recordAnswer(key, value) {
+  answers[key] = value;
+  const block = document.getElementById('qblock-' + key);
+  if (block) {
+    block.classList.add('answered');
+  }
+}
+
+// ============================================================
+// NAVIGATION
+// ============================================================
+function goToStep(step) {
+  document.getElementById('page-' + currentStep).classList.remove('active');
+  document.getElementById('page-' + step).classList.add('active');
+  currentStep = step;
+  updateProgress();
+  updateStepNav();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function nextStep() {
+  if (currentStep < TOTAL_STEPS - 1) {
+    goToStep(currentStep + 1);
+  }
+}
+
+function prevStep() {
+  if (currentStep > 0) {
+    goToStep(currentStep - 1);
+  }
+}
+
+function updateProgress() {
+  var pct = Math.round((currentStep / (TOTAL_STEPS - 1)) * 100);
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('stepLabel').textContent = 'الخطوة ' + (currentStep + 1) + ' من ' + TOTAL_STEPS;
+  document.getElementById('pctLabel').textContent = pct + '%';
+}
+
+function updateStepNav() {
+  var btns = document.querySelectorAll('.step-btn');
+  btns.forEach(function(btn, i) {
+    btn.classList.remove('active', 'done');
+    if (i === currentStep) btn.classList.add('active');
+    else if (i < currentStep) btn.classList.add('done');
+  });
+}
+
+// ============================================================
+// VALIDATION
+// ============================================================
+function validateOrgAndNext() {
+  var sector = document.getElementById('orgSector').value;
+  var size = document.getElementById('orgSize').value;
+  var loc = document.getElementById('orgLocation').value;
+  var ai = document.getElementById('aiUsage').value;
+  var warn = document.getElementById('orgWarning');
+  if (!sector || !size || !loc || !ai) {
+    warn.classList.add('show');
+    return;
+  }
+  warn.classList.remove('show');
+  nextStep();
+}
+
+function validateDimAndNext(dimIndex) {
+  var dim = dimensions[dimIndex];
+  var allAnswered = true;
+  dim.questions.forEach(function(q, qi) {
+    var key = 'd' + dimIndex + 'q' + qi;
+    if (!answers[key]) {
+      allAnswered = false;
+      var block = document.getElementById('qblock-' + key);
+      if (block) {
+        block.style.border = '2px solid #e74c3c';
+        block.style.background = '#fff5f5';
+        setTimeout(function() {
+          block.style.border = '';
+          block.style.background = '';
+        }, 2500);
+      }
+    }
+  });
+  var warn = document.getElementById('dimWarning-' + dimIndex);
+  if (!allAnswered) {
+    if (warn) warn.classList.add('show');
+    return;
+  }
+  if (warn) warn.classList.remove('show');
+  if (dimIndex === 4) {
+    buildResults();
+    goToStep(7);
+  } else {
+    nextStep();
+  }
+}
+
+// ============================================================
+// RESULTS
+// ============================================================
+function getDimScore(dimIndex) {
+  var total = 0;
+  dimensions[dimIndex].questions.forEach(function(q, qi) {
+    var key = 'd' + dimIndex + 'q' + qi;
+    total += answers[key] ? parseInt(answers[key]) : 0;
+  });
+  return total;
+}
+
+function buildResults() {
+  var dimScores = [];
+  var grandTotal = 0;
+  dimensions.forEach(function(dim, i) {
+    var s = getDimScore(i);
+    dimScores.push(s);
+    grandTotal += s;
+  });
+
+  var maxPerDim = 20;
+  var maxTotal = 100;
+  var pct = Math.round((grandTotal / maxTotal) * 100);
+
+  // Score display
+  document.getElementById('totalScore').textContent = pct;
+
+  // Maturity level
+  var level, levelClass, title, desc;
+  if (pct <= 35) {
+    level = "Emerging (ناشئ)";
+    levelClass = "maturity-emerging";
+    title = "مستوى ناشئ: الجاهزية في مراحلها الأولى";
+    desc = "تفتقر المنظمة إلى معظم عناصر حوكمة الذكاء الاصطناعي. التدخل العاجل ضروري لبناء الأسس اللازمة وتفادي المخاطر المرتبطة باعتماد الذكاء الاصطناعي دون إطار حوكمي واضح.";
+  } else if (pct <= 55) {
+    level = "Developing (في طور التطوير)";
+    levelClass = "maturity-developing";
+    title = "مستوى في طور التطوير: أسس جيدة تحتاج تعزيزاً";
+    desc = "توجد بعض العناصر الجيدة لكنها تبقى جزئية وغير مكتملة. هذه المرحلة تستدعي تسريع بناء السياسات وتعزيز الكفاءات التقنية ومأسسة آليات المساءلة.";
+  } else if (pct <= 75) {
+    level = "Established (راسخ)";
+    levelClass = "maturity-established";
+    title = "مستوى راسخ: حوكمة ذكاء اصطناعي وظيفية";
+    desc = "تمتلك المنظمة إطاراً حوكمياً وظيفياً بممارسات موثقة وعمليات مؤسسية. التحسين مستمر يستهدف سد الثغرات المتبقية في الأبعاد الأضعف والارتقاء نحو التميز.";
+  } else {
+    level = "Advanced (متقدم)";
+    levelClass = "maturity-advanced";
+    title = "مستوى متقدم: نموذج رائد في حوكمة الذكاء الاصطناعي";
+    desc = "تُعدّ المنظمة نموذجاً يُحتذى به على مستوى القطاع. الجهود الآن تتمحور حول الابتكار المستمر في الحوكمة ومشاركة الخبرات مع المنظمات الأخرى.";
+  }
+
+  var badge = document.getElementById('maturityBadge');
+  badge.textContent = level;
+  badge.className = 'maturity-badge ' + levelClass;
+  document.getElementById('maturityTitle').textContent = title;
+  document.getElementById('maturityDesc').textContent = desc;
+
+  // Dim scores grid
+  var colors = ['#e74c3c','#e67e22','#f1c40f','#2ecc71','#3498db'];
+  var grid = document.getElementById('dimScoresGrid');
+  grid.innerHTML = '';
+  dimensions.forEach(function(dim, i) {
+    var s = dimScores[i];
+    var pctDim = Math.round((s / maxPerDim) * 100);
+    var col = pctDim >= 75 ? '#27ae60' : pctDim >= 50 ? '#f39c12' : '#e74c3c';
+    grid.innerHTML += '<div class="dim-score-card">' +
+      '<div class="dim-name">' + dim.nameAr + '<br><small style="font-weight:400;color:var(--muted);">' + dim.nameEn + '</small></div>' +
+      '<div class="score-bar-track"><div class="score-bar-fill" style="width:' + pctDim + '%;background:' + col + ';"></div></div>' +
+      '<div class="dim-score-meta"><span class="val">' + s + ' / ' + maxPerDim + '</span><span>' + pctDim + '%</span></div>' +
+      '</div>';
+  });
+
+  // Comparison table
+  var tbody = document.getElementById('compTableBody');
+  tbody.innerHTML = '';
+  dimensions.forEach(function(dim, i) {
+    var s = dimScores[i];
+    var avg = dim.studyAvg;
+    var gap = (s - avg).toFixed(1);
+    var gapStr = gap > 0 ? '+' + gap : '' + gap;
+    var gapColor = gap > 0 ? 'color:var(--success)' : gap < 0 ? 'color:var(--danger)' : '';
+    tbody.innerHTML += '<tr>' +
+      '<td>' + dim.nameAr + '</td>' +
+      '<td><strong>' + s.toFixed(1) + '</strong></td>' +
+      '<td>' + avg + '</td>' +
+      '<td style="' + gapColor + ';font-weight:700;">' + gapStr + '</td>' +
+      '</tr>';
+  });
+  // Total row
+  var studyTotal = dimensions.reduce(function(a, d) { return a + d.studyAvg; }, 0);
+  var totalGap = (grandTotal - studyTotal).toFixed(1);
+  var totalGapStr = totalGap > 0 ? '+' + totalGap : '' + totalGap;
+  tbody.innerHTML += '<tr class="highlight">' +
+    '<td>المجموع الكلي</td>' +
+    '<td><strong>' + grandTotal + '</strong></td>' +
+    '<td>' + studyTotal.toFixed(1) + '</td>' +
+    '<td style="font-weight:700;">' + totalGapStr + '</td>' +
+    '</tr>';
+
+  // Recommendations
+  var sorted = dimScores.map(function(s, i) { return { i: i, s: s, pct: Math.round((s/maxPerDim)*100) }; })
+    .sort(function(a, b) { return a.pct - b.pct; });
+
+  var recDefs = [
+    [
+      "البُعد الأول (الاستراتيجية والقيادة): ابدأ بصياغة ورقة موقف تنظيمية حول الذكاء الاصطناعي، وتعيين مسؤول تنفيذي مكلف رسمياً بملف الحوكمة، ووضع خارطة طريق بأهداف قابلة للقياس على المدى القصير والمتوسط.",
+      "البُعد الثاني (الإطار التنظيمي): أعطِ الأولوية لوضع سياسة استخدام مقبول للذكاء الاصطناعي وآليات الامتثال، بالاستناد إلى معايير ISO/IEC 42001 وإرشادات اليونسكو لأخلاقيات الذكاء الاصطناعي.",
+      "البُعد الثالث (الجاهزية التقنية): استثمر في تدريب الكوادر التقنية وتحديث البنية التحتية للبيانات، مع اعتماد منهجيات موثقة لتطوير النماذج وإدارة دورة حياتها.",
+      "البُعد الرابع (الشفافية والمساءلة): أنشئ سجلاً داخلياً لأنظمة الذكاء الاصطناعي المستخدمة، وحدد قنوات تواصل واضحة لتلقي الملاحظات، وطوّر إجراءات للتدقيق الدوري.",
+      "البُعد الخامس (الأخلاقيات والشمولية): طوّر ميثاق أخلاقيات خاص بالمنظمة، وادرج تقييمات التحيز ضمن دورة تطوير الأنظمة، وخصص ميزانية للتدريب على الذكاء الاصطناعي المسؤول."
+    ]
+  ];
+
+  var allRecs = [
+    "البُعد الأول (الاستراتيجية والقيادة): ابدأ بصياغة ورقة موقف تنظيمية حول الذكاء الاصطناعي وتعيين مسؤول تنفيذي مكلف رسمياً بملف الحوكمة مع وضع خارطة طريق بأهداف قابلة للقياس.",
+    "البُعد الثاني (الإطار التنظيمي): أعطِ الأولوية لوضع سياسة استخدام مقبول للذكاء الاصطناعي وآليات الامتثال بالاستناد إلى معايير ISO/IEC 42001 وإرشادات اليونسكو.",
+    "البُعد الثالث (الجاهزية التقنية): استثمر في تدريب الكوادر التقنية وتحديث البنية التحتية للبيانات مع اعتماد منهجيات موثقة لتطوير النماذج.",
+    "البُعد الرابع (الشفافية والمساءلة): أنشئ سجلاً داخلياً لأنظمة الذكاء الاصطناعي وحدد قنوات تواصل واضحة لتلقي الملاحظات وطوّر إجراءات للتدقيق الدوري.",
+    "البُعد الخامس (الأخلاقيات والشمولية): طوّر ميثاق أخلاقيات خاص بالمنظمة وادرج تقييمات التحيز ضمن دورة تطوير الأنظمة وخصص ميزانية للتدريب على الذكاء الاصطناعي المسؤول."
+  ];
+
+  var recs = document.getElementById('recsContainer');
+  recs.innerHTML = '';
+  sorted.slice(0, 3).forEach(function(item, rank) {
+    var cls = rank === 0 ? 'rec-high' : rank === 1 ? 'rec-med' : 'rec-low';
+    var priority = rank === 0 ? 'أولوية عالية' : rank === 1 ? 'أولوية متوسطة' : 'أولوية منخفضة';
+    recs.innerHTML += '<div class="rec-card ' + cls + '">' +
+      '<div class="priority">' + priority + '</div>' +
+      '<div class="rec-text">' + allRecs[item.i] + '</div>' +
+      '</div>';
+  });
+}
+
+// ============================================================
+// RESET
+// ============================================================
+function resetAssessment() {
+  answers = {};
+  // Reset radio buttons
+  document.querySelectorAll('input[type="radio"]').forEach(function(r) { r.checked = false; });
+  document.querySelectorAll('.question-block').forEach(function(b) { b.classList.remove('answered'); });
+  document.getElementById('orgSector').value = '';
+  document.getElementById('orgSize').value = '';
+  document.getElementById('orgLocation').value = '';
+  document.getElementById('aiUsage').value = '';
+  goToStep(0);
+}
+
+// ============================================================
+// INIT
+// ============================================================
+(function init() {
+  dimensions.forEach(function(dim, i) {
+    buildDimPage(i);
+  });
+  updateProgress();
+  updateStepNav();
+})();
+</script>
+</body>
+</html>
